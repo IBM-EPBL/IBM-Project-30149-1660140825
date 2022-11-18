@@ -1,5 +1,5 @@
 FROM python:3.7-alpine
-LABEL maintainer="susanthika m, susanthika02m@gmail.com
+LABEL maintainer="susanthika m, susanthika02m@gmail.com"
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 COPY requirements.txt requirements.txt
