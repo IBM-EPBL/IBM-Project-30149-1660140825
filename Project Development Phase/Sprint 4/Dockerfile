@@ -1,10 +1,11 @@
-  FROM python:2.7
-  LABEL maintainer="Kunal Malhotra, kunal.malhotra1@ibm.com"
-  RUN apt-get update
-  RUN mkdir /app
-  WORKDIR /app
-  COPY . /app
-  RUN pip install -r requirements.txt
-  EXPOSE 5000
-  ENTRYPOINT [ "python" ]
-  CMD [ "app.py" ]
+FROM python:3.7-alpine
+LABEL maintainer="susanthika m, susanthika02m@gmail.com
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+EXPOSE 5000
+COPY . .
+ENTRYPOINT [ "python" ]
+CMD [ "app.py" ]
+WORKDIR /docker-plasma app
