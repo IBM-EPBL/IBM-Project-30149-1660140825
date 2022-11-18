@@ -3,11 +3,39 @@ import ibm_db
 import re
 import os
 from dotenv import load_dotenv
+import sendgrid 
+from sendgrid.helpers.mail import *
+from sendgridmail import sendmail
 load_dotenv()
 app = Flask(__name__)
 app.secret_key ='a'
 conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=0c77d6f2-5da9-48a9-81f8-86b520b87518.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31198;SECURITY=SSL;SSLServerCertificate=Certificate.crt;UID=jqy91109;PWD=jKfOzK88qIqZnQQK",'','')
 print(conn)
+
+# sendgrid integration
+def mailtest_registration(to_email):
+    sg = sendgrid.SendGridAPIClient(api_key= 'apikey' )
+    from_email = Email("susanthika02m@gmail.com")
+    subject = "Registration Successfull!"
+    content = Content("text/plain", "You have successfully registered as user. Please Login using your Username and Password to donate/request for Plasma.")
+    mail = Mail(from_email, to_email, subject, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
+    print(response.status_code)
+    print(response.body)
+    print(response.headers)
+#for donor
+def mailtest_donor(to_email):
+    sg = sendgrid.SendGridAPIClient(api_key= 'apikey' )
+    from_email = Email("susanthika02m@gmail.com")
+    subject = "Thankyou for Registering as Donor!"
+    content = Content("text/plain", "Every donor is an asset to the nation who saves people's lives, and you're one of them.We appreciate your efforts. Thank you!!")
+    mail = Mail(from_email, to_email, subject, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
+    print(response.status_code)
+    print(response.body)
+    print(response.headers)
+
+    
 @app.route('/register',methods=['GET', 'POST'])
 def register():
     msg = " "
@@ -26,11 +54,13 @@ def register():
         if (account):
             msg = "Account already exists!"
             return render_template('login.html', msg=msg)
-        # elif not re.match(r'[^@]+@[^@]+\.[^@]+', email_id):
-        #     msg = "Invalid email addres"
-        # elif not re.match(r'[A-Za-z0-9+', username):
-        #     msg = "Name must contain only characters and numbers"
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email_id):
+            msg = "Invalid email addres"
+        elif not re.match(r'[A-Za-z0-9+', username):
+            msg = "Name must contain only characters and numbers"
         else:
+            
+            mailtest_registration(email)
             insert_sql= "INSERT INTO USER1 values(?,?,?,?,?,?)"
             stmt = ibm_db.prepare(conn, insert_sql)
             ibm_db.bind_param(stmt, 1, username)
@@ -80,7 +110,7 @@ def welcome():
     return render_template("welcome.html")
 @app.route('/reset', methods=['GET', 'POST'])
 def reset():
-    #sendemail('.com','s')
+    sendemail('
     return render_template('reset.html')
     
 @app.route('/req', methods = ['GET', 'POST'])
